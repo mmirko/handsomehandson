@@ -34,7 +34,7 @@ def Info(message):
 def Debug(message):
     print ("\033[35m[Debug]\033[0m - " + message)
 
-def targetcommitblock(debug,blockinfo,block):
+def targetcommitblock(debug,blockinfo,block,seq):
     # Possible command:
     # "show_command_header" - yes no - defaults to yes
     # "show_command" - yes no - defaults to yes
@@ -47,6 +47,7 @@ def targetcommitblock(debug,blockinfo,block):
     # "post_output_wait" - yes no - defaults to no
 
     result=""
+    resultv=""
 
     if "pre_command_wait" in blockinfo and blockinfo["pre_command_wait"]=="no":
         if debug: Debug("  Block pre-command wait not used")
@@ -54,6 +55,9 @@ def targetcommitblock(debug,blockinfo,block):
         if debug: Debug("  Block pre-command wait used")
         result+="\n# Pre-Command wait\n"
         result+="read -n 1 -s -r\n"
+        resultv+="import -window root frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="read -n 1 -s -r\n"
+        seq+=1
 
     if "show_command_header" in blockinfo and blockinfo["show_command_header"]=="no":
         if debug: Debug("  Block command header not shown")
@@ -61,6 +65,7 @@ def targetcommitblock(debug,blockinfo,block):
         if debug: Debug("  Block command header shown")
         result+="\n# Command header\n"
         result+="echo -en \"\033[32m\033[11D[ Command > \033[0m\"\n"
+        resultv+="echo -en \"\033[32m\033[11D[ Command > \033[0m\"\n"
 
     if "show_command" in blockinfo and blockinfo["show_command"]=="no":
         if debug: Debug("  Block command not shown")
@@ -70,11 +75,17 @@ def targetcommitblock(debug,blockinfo,block):
         result+="cat << EndOfBlock\n"
         result+=block
         result+="EndOfBlock\n"
+        resultv+="cat << EndOfBlock\n"
+        resultv+=block
+        resultv+="EndOfBlock\n"
 
     if "post_command_wait" in blockinfo and blockinfo["post_command_wait"]=="yes":
         if debug: Debug("  Block post-command wait used")
         result+="\n# Post-Command wait\n"
         result+="read -n 1 -s -r\n"
+        resultv+="import -window root frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="read -n 1 -s -r\n"
+        seq+=1
     else:
         if debug: Debug("  Block post-command wait not used")
 
@@ -84,6 +95,9 @@ def targetcommitblock(debug,blockinfo,block):
         if debug: Debug("  Block pre-output wait used")
         result+="\n# Pre-output wait\n"
         result+="read -n 1 -s -r\n"
+        resultv+="import -window root frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="read -n 1 -s -r\n"
+        seq+=1
 
     if "show_output_header" in blockinfo and blockinfo["show_output_header"]=="no":
         if debug: Debug("  Block output header not shown")
@@ -91,6 +105,7 @@ def targetcommitblock(debug,blockinfo,block):
         if debug: Debug("  Block output header shown")
         result+="\n# Output header\n"
         result+="echo -e \"\033[31m\033[11D[ Output  > \033[0m\"\n"
+        resultv+="echo -e \"\033[31m\033[11D[ Output  > \033[0m\"\n"
 
     if "show_output" in blockinfo and blockinfo["show_output"]=="no":
         if debug: Debug("  Block output not shown")
@@ -98,16 +113,20 @@ def targetcommitblock(debug,blockinfo,block):
         if debug: Debug("  Block output shown")
         result+="\n# Output display\n"
         result+=block
+        resultv+=block
 
     if "post_output_wait" in blockinfo and blockinfo["post_output_wait"]=="yes":
         if debug: Debug("  Block post-output wait used")
         result+="\n# Post-Output wait\n"
         result+="read -n 1 -s -r\n"
+        resultv+="import -window root frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="read -n 1 -s -r\n"
+        seq+=1
     else:
         if debug: Debug("  Block post-output wait not used")
 
 
-    return result
+    return result,resultv,seq
 
 def main():
     arguments = docopt(__doc__, version='Handsome Hands-on 1.0')
@@ -158,6 +177,7 @@ def main():
 
     insideblock = False
     block = ""
+    seq=0
 
     for line in ssource:
         m = re.search("^" + marker + "_begin", line)
@@ -188,7 +208,9 @@ def main():
                     print (block.rstrip())
                     Debug("Block ended")
                 
-                ttarget.write(targetcommitblock(debug,blockinfo,block))
+
+                result,resultv,seq=targetcommitblock(debug,blockinfo,block,seq)
+                ttarget.write(result)
 
                 block = ""
                 insideblock = False
@@ -196,6 +218,8 @@ def main():
             else:
                 if insideblock:
                     block+=line
+                else:
+                    ttarget.write(line)
 
     ssource.close()
     ttarget.close()
