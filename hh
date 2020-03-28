@@ -19,6 +19,8 @@ Options:
 from docopt import docopt
 from os import path
 import sys
+import re
+import json
 
 def Alert(message):
     print ("\033[31m[Alert]\033[0m - " + message)
@@ -71,20 +73,54 @@ def main():
             ssource.close()
             sys.exit(1)
 
+    if debug: Debug("Start parsing script")
+
+    insideblock = False
+    block = ""
+
     for line in ssource:
-        m = re.search("^" + marker + "_begin", i)
+        m = re.search("^" + marker + "_begin", line)
         if m:
+            if insideblock:
+                Alert("Wrong sequence of blocks")
+                sys.exit(1)
 
+            diffdata = line.replace(marker + "_begin", "").strip()
+            try:
+                currblockinfo = json.loads(diffdata)
+                insideblock = True
+                if debug:
+                    Debug("Loaded new block: "+str(diffdata))
+                    Debug("Block data:")
+            except:
+                Alert("Decoding of json failed: "+str(diffdata))
+                sys.exit(1)
 
+        else:
+            m = re.search("^" + marker + "_end", line)
+            if m:
+                if not insideblock:
+                    Alert("Wrong sequence of blocks")
+                    sys.exit(1)
+
+                if debug:
+                    print (block.rstrip())
+                    Debug("Block ended")
+                
+
+                # TODO Commit block
+                block = ""
+                insideblock = False
+
+            else:
+                if insideblock:
+                    block+=line
 
     ssource.close()
 
 
 #    m = re.search("^" + marker + "_begin", i)
 #    if m:
-#        try:
-#            diffdata = i.replace(marker + "_begin", "")
-#            currblockinfo = json.loads(diffdata)
 #            if "name" in currblockinfo:
 #                beginblock = True
 #

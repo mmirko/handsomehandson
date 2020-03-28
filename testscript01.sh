@@ -1,5 +1,6 @@
 #!/bin/bash
 
-#handsomeh {"output": "yes"}
+#handsomeh_begin {"output": "yes"}
 echo "Test01"
+#handsomeh_end
 
