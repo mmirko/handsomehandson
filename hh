@@ -17,7 +17,7 @@ Options:
   -d                                                Debug
 """
 from docopt import docopt
-from os import path
+from os import path,mkdir
 import sys
 import re
 import json
@@ -172,6 +172,32 @@ def main():
         Alert("Error opening target script '"+targetscript+"'")
         sys.exit(1)        
 
+    if beamerdir != None:
+        try:
+            mkdir(beamerdir)
+        except:
+            Alert("Error: creation of the directory '"+beamerdir+"' failed")
+            sys.exit(1)
+
+        try:
+            btarget = open(beamerdir+"/script.sh","w")
+        except:
+            Alert("Error opening target script '"+beamerdir+"/script.sh'")
+            sys.exit(1)        
+
+    if videodir != None:
+        try:
+            mkdir(videodir)
+        except:
+            Alert("Error: creation of the directory '"+videodir+"' failed")
+            sys.exit(1)
+
+        try:
+            vtarget = open(videodir+"/script.sh","w")
+        except:
+            Alert("Error opening target script '"+videodir+"/script.sh'")
+            sys.exit(1)        
+
 
     if debug: Debug("Start parsing script")
 
@@ -211,6 +237,8 @@ def main():
 
                 result,resultv,seq=targetcommitblock(debug,blockinfo,block,seq)
                 ttarget.write(result)
+                if beamerdir != None: btarget.write(resultv)
+                if videodir != None: vtarget.write(resultv)
 
                 block = ""
                 insideblock = False
@@ -220,9 +248,13 @@ def main():
                     block+=line
                 else:
                     ttarget.write(line)
+                    if beamerdir != None: btarget.write(line)
+                    if videodir != None: vtarget.write(line)
 
     ssource.close()
     ttarget.close()
+    if beamerdir != None: btarget.close()
+    if videodir != None: vtarget.close()
 
 
 if __name__ == '__main__':
