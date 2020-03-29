@@ -2,9 +2,8 @@
 
 reset
 
-#handsomeh_begin {"show_output": "no"}
+#handsomeh_begin {"show_output": "yes"}
 echo "Test01"
- 
 #handsomeh_end
 
 #handsomeh_begin {"show_output_header": "yes"}

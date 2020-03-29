@@ -274,6 +274,16 @@ def main():
         chdir(beamerdir)
         system("./script.sh")
         chdir("..")
+        btarget=open(beamerdir+"/frame.tex","w")
+        btarget.write("\\begin{frame}{Frame Title}\n")
+        btarget.write("\\begin{figure}[ht]\n")
+        btarget.write("\\begin{overlayarea}{9cm}{8cm}\n")
+        for i in range(seq):
+            btarget.write("\\only<"+str(i+1)+">{\\includegraphics[width=9cm]{frameimg"+"{:0>3d}".format(i)+".jpg}}\n")
+        btarget.write("\\end{overlayarea}\n")
+        btarget.write("\\end{figure}\n")
+        btarget.write("\\end{frame}\n")
+
 
     if videodir != None:
         vtarget.write("sleep 1\n")
