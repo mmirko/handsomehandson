@@ -55,7 +55,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         if debug: Debug("  Block pre-command wait used")
         result+="\n# Pre-Command wait\n"
         result+="read -n 1 -s -r\n"
-        resultv+="import -window root frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         resultv+="read -n 1 -s -r\n"
         seq+=1
 
@@ -83,7 +83,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         if debug: Debug("  Block post-command wait used")
         result+="\n# Post-Command wait\n"
         result+="read -n 1 -s -r\n"
-        resultv+="import -window root frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         resultv+="read -n 1 -s -r\n"
         seq+=1
     else:
@@ -95,7 +95,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         if debug: Debug("  Block pre-output wait used")
         result+="\n# Pre-output wait\n"
         result+="read -n 1 -s -r\n"
-        resultv+="import -window root frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         resultv+="read -n 1 -s -r\n"
         seq+=1
 
@@ -119,7 +119,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         if debug: Debug("  Block post-output wait used")
         result+="\n# Post-Output wait\n"
         result+="read -n 1 -s -r\n"
-        resultv+="import -window root frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         resultv+="read -n 1 -s -r\n"
         seq+=1
     else:
