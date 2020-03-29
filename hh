@@ -17,8 +17,9 @@ Options:
   -d                                                Debug
 """
 from docopt import docopt
-from os import path,mkdir
+from os import path,mkdir,chmod,system,chdir
 import sys
+import stat
 import re
 import json
 
@@ -55,8 +56,8 @@ def targetcommitblock(debug,blockinfo,block,seq):
         if debug: Debug("  Block pre-command wait used")
         result+="\n# Pre-Command wait\n"
         result+="read -n 1 -s -r\n"
+        resultv+="sleep 1\n"
         resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n"
-        resultv+="read -n 1 -s -r\n"
         seq+=1
 
     if "show_command_header" in blockinfo and blockinfo["show_command_header"]=="no":
@@ -83,8 +84,8 @@ def targetcommitblock(debug,blockinfo,block,seq):
         if debug: Debug("  Block post-command wait used")
         result+="\n# Post-Command wait\n"
         result+="read -n 1 -s -r\n"
+        resultv+="sleep 1\n"
         resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n"
-        resultv+="read -n 1 -s -r\n"
         seq+=1
     else:
         if debug: Debug("  Block post-command wait not used")
@@ -95,8 +96,8 @@ def targetcommitblock(debug,blockinfo,block,seq):
         if debug: Debug("  Block pre-output wait used")
         result+="\n# Pre-output wait\n"
         result+="read -n 1 -s -r\n"
+        resultv+="sleep 1\n"
         resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n"
-        resultv+="read -n 1 -s -r\n"
         seq+=1
 
     if "show_output_header" in blockinfo and blockinfo["show_output_header"]=="no":
@@ -109,6 +110,12 @@ def targetcommitblock(debug,blockinfo,block,seq):
 
     if "show_output" in blockinfo and blockinfo["show_output"]=="no":
         if debug: Debug("  Block output not shown")
+        result+="\n# Output not shown\n"
+        for line in block.split("\n"):
+            line=line.strip()
+            if line !="":
+                result+=line+" > /dev/null 2>&1\n"
+                resultv+=line+" > /dev/null 2>&1\n"
     else:
         if debug: Debug("  Block output shown")
         result+="\n# Output display\n"
@@ -119,8 +126,8 @@ def targetcommitblock(debug,blockinfo,block,seq):
         if debug: Debug("  Block post-output wait used")
         result+="\n# Post-Output wait\n"
         result+="read -n 1 -s -r\n"
+        resultv+="sleep 1\n"
         resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n"
-        resultv+="read -n 1 -s -r\n"
         seq+=1
     else:
         if debug: Debug("  Block post-output wait not used")
@@ -251,11 +258,31 @@ def main():
                     if beamerdir != None: btarget.write(line)
                     if videodir != None: vtarget.write(line)
 
+    ttarget.write("\n# Final wait\n")
+    ttarget.write("read -n 1 -s -r\n")
+ 
     ssource.close()
     ttarget.close()
-    if beamerdir != None: btarget.close()
-    if videodir != None: vtarget.close()
 
+    chmod(targetscript, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+
+    if beamerdir != None:
+        btarget.write("sleep 1\n")
+        btarget.write("import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n")
+        btarget.close()
+        chmod(beamerdir+"/script.sh", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        chdir(beamerdir)
+        system("./script.sh")
+        chdir("..")
+
+    if videodir != None:
+        vtarget.write("sleep 1\n")
+        vtarget.write("import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` frameimg"+"{:0>3d}".format(seq)+".jpg\n")
+        vtarget.close()
+        chmod(videodir+"/script.sh", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        chdir(videodir)
+        system("./script.sh")
+        chdir("..")
 
 if __name__ == '__main__':
     main()
