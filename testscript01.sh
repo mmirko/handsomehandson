@@ -2,7 +2,7 @@
 
 reset
 
-#handsomeh_begin {"show_output": "yes"}
+#handsomeh_begin {}
 echo "Test01"
 #handsomeh_end
 
