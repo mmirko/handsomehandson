@@ -121,6 +121,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
                     resultv+=line+" > /dev/null 2>&1\n"
         else:
             result+="(\n"
+            resultv+="(\n"
             for line in block.split("\n"):
                 line=line.strip()
                 if line !="":
@@ -266,6 +267,8 @@ def main():
                 if insideblock:
                     block+=line
                 else:
+                    if line == "#!/bin/bash":
+                        line = "ciao"
                     ttarget.write(line)
                     if beamerdir != None: btarget.write(line)
                     if videodir != None: vtarget.write(line)
