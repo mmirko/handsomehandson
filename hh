@@ -47,6 +47,8 @@ def targetcommitblock(debug,blockinfo,block,seq):
     # "pre_output_wait" - yes no - defaults to yes
     # "post_output_wait" - yes no - defaults to no
 
+    # "post_output_wait" - yes no - defaults to yes (only used and relevand for not shown output
+
     result=""
     resultv=""
 
@@ -111,11 +113,21 @@ def targetcommitblock(debug,blockinfo,block,seq):
     if "show_output" in blockinfo and blockinfo["show_output"]=="no":
         if debug: Debug("  Block output not shown")
         result+="\n# Output not shown\n"
-        for line in block.split("\n"):
-            line=line.strip()
-            if line !="":
-                result+=line+" > /dev/null 2>&1\n"
-                resultv+=line+" > /dev/null 2>&1\n"
+        if "subshell" in blockinfo and blockinfo["subshell"]=="no":
+            for line in block.split("\n"):
+                line=line.strip()
+                if line !="":
+                    result+=line+" > /dev/null 2>&1\n"
+                    resultv+=line+" > /dev/null 2>&1\n"
+        else:
+            result+="(\n"
+            for line in block.split("\n"):
+                line=line.strip()
+                if line !="":
+                    result+=line+"\n"
+                    resultv+=line+"\n"
+            result+=") > /dev/null 2>&1\n"
+            resultv+=") > /dev/null 2>&1\n"
     else:
         if debug: Debug("  Block output shown")
         result+="\n# Output display\n"
