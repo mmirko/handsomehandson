@@ -47,7 +47,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
     # "pre_output_wait" - yes no - defaults to yes
     # "post_output_wait" - yes no - defaults to no
 
-    # "post_output_wait" - yes no - defaults to yes (only used and relevand for not shown output
+    # "subshell" - yes no - defaults to yes (only used and relevand for not shown output)
 
     result=""
     resultv=""
@@ -59,7 +59,8 @@ def targetcommitblock(debug,blockinfo,block,seq):
         result+="\n# Pre-Command wait\n"
         result+="read -n 1 -s -r\n"
         resultv+="sleep 1\n"
-        resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        #resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         seq+=1
 
     if "show_command_header" in blockinfo and blockinfo["show_command_header"]=="no":
@@ -87,7 +88,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         result+="\n# Post-Command wait\n"
         result+="read -n 1 -s -r\n"
         resultv+="sleep 1\n"
-        resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         seq+=1
     else:
         if debug: Debug("  Block post-command wait not used")
@@ -99,7 +100,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         result+="\n# Pre-output wait\n"
         result+="read -n 1 -s -r\n"
         resultv+="sleep 1\n"
-        resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         seq+=1
 
     if "show_output_header" in blockinfo and blockinfo["show_output_header"]=="no":
@@ -140,7 +141,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         result+="\n# Post-Output wait\n"
         result+="read -n 1 -s -r\n"
         resultv+="sleep 1\n"
-        resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"frameimg"+"{:0>3d}".format(seq)+".jpg\n"
+        resultv+="import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         seq+=1
     else:
         if debug: Debug("  Block post-output wait not used")
@@ -267,12 +268,16 @@ def main():
                 if insideblock:
                     block+=line
                 else:
-                    if line == "#!/bin/bash\n":
-                        line += "export HHCWD=`pwd`\n"
                     ttarget.write(line)
-                    if beamerdir != None: btarget.write(line)
-                    if videodir != None: vtarget.write(line)
-
+                    if beamerdir != None: 
+                        if line == "#!/bin/bash\n":
+                            line += "export HHCWD=`pwd`\n"
+                        btarget.write(line)
+                    if videodir != None:
+                        if line == "#!/bin/bash\n":
+                            line += "export HHCWD=`pwd`\n"
+                        vtarget.write(line)
+ 
     ttarget.write("\n# Final wait\n")
     ttarget.write("read -n 1 -s -r\n")
  
@@ -283,7 +288,8 @@ def main():
 
     if beamerdir != None:
         btarget.write("sleep 1\n")
-        btarget.write("import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"frameimg"+"{:0>3d}".format(seq)+".jpg\n")
+        #btarget.write("import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n")
+        btarget.write("import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n")
         btarget.close()
         chmod(beamerdir+"/script.sh", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
         chdir(beamerdir)
@@ -302,7 +308,7 @@ def main():
 
     if videodir != None:
         vtarget.write("sleep 1\n")
-        vtarget.write("import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"frameimg"+"{:0>3d}".format(seq)+".jpg\n")
+        vtarget.write("import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n")
         vtarget.close()
         chmod(videodir+"/script.sh", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
         chdir(videodir)
