@@ -36,6 +36,8 @@ Options:
 
 docopt
 
+imagemagick
+
 xdotool
 
 ffmpeg
