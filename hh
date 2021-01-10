@@ -46,8 +46,15 @@ def targetcommitblock(debug,blockinfo,block,seq):
     # "post_command_wait" - yes no - defaults to no
     # "pre_output_wait" - yes no - defaults to yes
     # "post_output_wait" - yes no - defaults to no
+    
+    # "subshell" - yes no - defaults to yes (only used and relevant for not shown output)
 
-    # "subshell" - yes no - defaults to yes (only used and relevand for not shown output)
+    # TODO
+    # "pre_command_comment" - comment id
+    # "post_command_comment" - commend id
+    # "pre_output_comment" - comment id
+    # "post_output_comment" - comment id
+
 
     result=""
     resultv=""
