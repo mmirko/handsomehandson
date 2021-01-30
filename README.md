@@ -5,7 +5,10 @@ Simple Python3 program to create demos from actual shell scripts
 ## Usage
 
 The purpose of HandsomeHandson (HH) is to transform a Linux shell script into a demo (target) script. I created it to simplify the creation of hands-on for my projects.  
-The two scripts (the source one and the demo) execute the same commands but the demo will pause the execution waiting for a key press according to some comments placed in the source script.  The pause is meant to be used by an hypothetical speaker that is talking about the current script's line.  
+The two scripts (the source one and the demo) execute the same commands but the demo will pause the execution waiting for a key press according to some comments placed in the source script.  The pause is meant to be used by an hypothetical speaker that is talking about the current script's line. HH can also create a sequence of frames, a video or a Beamer slide showing the script execution.
+
+d
+
 
 HH accepts the following options:
 
@@ -24,6 +27,76 @@ Options:
   -d                                                Debug  
 </pre>
 
+## Example
+
+This is a simple example. A Script like the following (sourcescript):
+
+```bash
+#!/bin/bash
+
+reset
+
+#handsomeh_begin {}
+echo "Test01"
+#handsomeh_end
+
+#handsomeh_begin {"show_output_header": "yes"}
+echo "Test02"
+#handsomeh_end
+```
+
+is transformed by HH into (targetscript):
+
+```bash
+#!/bin/bash
+
+reset
+
+# Pre-Command wait
+read -n 1 -s -r
+
+# Command header
+[ Command > "
+
+# Command display
+cat << EndOfBlock
+echo "Test01"
+EndOfBlock
+
+# Pre-output wait
+read -n 1 -s -r
+
+# Output header
+[ Output  > "
+
+# Output display
+echo "Test01"
+
+# Pre-Command wait
+read -n 1 -s -r
+
+# Command header
+[ Command > "
+
+# Command display
+cat << EndOfBlock
+echo "Test02"
+EndOfBlock
+
+# Pre-output wait
+read -n 1 -s -r
+
+# Output header
+[ Output  > "
+
+# Output display
+echo "Test02"
+
+# Final wait
+read -n 1 -s -r
+```
+
+
 ## Phasis
 
 ## Block commands
@@ -32,7 +105,7 @@ Options:
 
 ## Installation
 
-### Pre-requisite
+### Dependencies
 
 docopt
 
