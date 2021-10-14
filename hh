@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 
 """Handsome Hands-on - A tool to create handons pre-scripted demo
-   Copyright 2020 - Mirko Mariotti - https://www.mirkomariotti.it
+   Copyright 2021 - Mirko Mariotti - https://www.mirkomariotti.it
 
 Usage:
-  hh -s <sourcescript> -t <targetscript> [-v <videodirectory>] [-b <beamerdirectory>] [--marker <textmarker>] [-d]
+  hh -s <sourcescript> [--marker <textmarker>] [-d] (-t <targetscript> | -f <framesdirectory> | -v <videofile> | -g <giffile> | -b <beamerdirectory>)
   hh -h | --help
 
 Options:
   -h --help                                         Show this screen.
   -s <sourcescript>, --source <sourcescript>        Source script
-  -t <targetscript>, --target <targetscript>        Target script
-  -v <videodirectory>, --video <videodirectory>     Target video directory
-  -b <beamerdirectory>, --beamer <beamerdirectory>  Target beamer directory
   --marker <textmarker>                             Marker to intercept commands [default: handsomeh]
   -d                                                Debug
+  -t <targetscript>, --target <targetscript>        Target script
+  -v <videofile>, --video <videofile>               Video file
+  -g <giffile>, --gif <giffile>                     GIF image
+  -f <framesdirectory>, --frames <framesdirectory>  Target frames directory
+  -b <beamerdirectory>, --beamer <beamerdirectory>  Target beamer directory
 """
 from docopt import docopt
 from os import path,mkdir,chmod,system,chdir
@@ -168,22 +170,46 @@ def main():
     if debug: Debug("Source script: "+sourcescript)   
 
     targetscript = arguments["--target"]
-    if debug: Debug("Target script: "+targetscript)   
+    if debug:
+        if targetscript: Debug("Target script: "+targetscript)
+        else: Debug("No target script")
+
+    videofile = arguments["--video"]
+    if debug:
+        if videofile: Debug("Video file: "+videofile)
+        else: Debug("No video file")
+
+    giffile = arguments["--gif"]
+    if debug:
+        if giffile: Debug("Gif file: "+giffile)
+        else: Debug("No gif file")
+
+    beamerdir = arguments["--beamer"]
+    if debug:
+        if beamerdir: Debug("Beamer directory: "+beamerdir)
+        else: Debug("No beamer dir")
+
+    framesdir = arguments["--frames"]
+    if debug:
+        if framesdir: Debug("Frames directory: "+framesdir)
+        else: Debug("No frames dir")
+ 
+    sys.exit(1)
 
     if path.exists(targetscript):
         Alert("Error: target file '"+targetscript+"' exists")
         sys.exit(1)
 
-    beamerdir = arguments["--beamer"]
-    if beamerdir != None:
-        if path.exists(beamerdir):
-            Alert("Error: beamer dir '"+beamerdir+"' exists")
-            sys.exit(1)
+    # beamerdir = arguments["--beamer"]
+    # if beamerdir != None:
+    #     if path.exists(beamerdir):
+    #         Alert("Error: beamer dir '"+beamerdir+"' exists")
+    #         sys.exit(1)
 
-    videodir = arguments["--video"]
-    if videodir != None:
-        if path.exists(videodir):
-            Alert("Error: video dir '"+videodir+"' exists")
+    framesdir = arguments["--frames"]
+    if framesdir != None:
+        if path.exists(framesdir):
+            Alert("Error: frames dir '"+framesdir+"' exists")
             sys.exit(1)
 
     if debug: Debug("Opening files")
@@ -213,17 +239,17 @@ def main():
             Alert("Error opening target script '"+beamerdir+"/script.sh'")
             sys.exit(1)        
 
-    if videodir != None:
+    if framesdir != None:
         try:
-            mkdir(videodir)
+            mkdir(framesdir)
         except:
-            Alert("Error: creation of the directory '"+videodir+"' failed")
+            Alert("Error: creation of the directory '"+framesdir+"' failed")
             sys.exit(1)
 
         try:
-            vtarget = open(videodir+"/script.sh","w")
+            vtarget = open(framesdir+"/script.sh","w")
         except:
-            Alert("Error opening target script '"+videodir+"/script.sh'")
+            Alert("Error opening target script '"+framesdir+"/script.sh'")
             sys.exit(1)        
 
 
@@ -266,7 +292,7 @@ def main():
                 result,resultv,seq=targetcommitblock(debug,blockinfo,block,seq)
                 ttarget.write(result)
                 if beamerdir != None: btarget.write(resultv)
-                if videodir != None: vtarget.write(resultv)
+                if framesdir != None: vtarget.write(resultv)
 
                 block = ""
                 insideblock = False
@@ -276,11 +302,11 @@ def main():
                     block+=line
                 else:
                     ttarget.write(line)
-                    if beamerdir != None: 
-                        if line == "#!/bin/bash\n":
-                            line += "export HHCWD=`pwd`\n"
-                        btarget.write(line)
-                    if videodir != None:
+                    # if beamerdir != None: 
+                    #     if line == "#!/bin/bash\n":
+                    #         line += "export HHCWD=`pwd`\n"
+                    #     btarget.write(line)
+                    if framesdir != None:
                         if line == "#!/bin/bash\n":
                             line += "export HHCWD=`pwd`\n"
                         vtarget.write(line)
@@ -313,12 +339,12 @@ def main():
         btarget.write("\\end{frame}\n")
 
 
-    if videodir != None:
+    if framesdir != None:
         vtarget.write("sleep 1\n")
         vtarget.write("import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n")
         vtarget.close()
-        chmod(videodir+"/script.sh", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
-        chdir(videodir)
+        chmod(framesdir+"/script.sh", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        chdir(framesdir)
         system("./script.sh")
         chdir("..")
 
