@@ -112,16 +112,27 @@ The result is the following
 
 ## Block commands
 
-## Examples
+HH works grouping lines of the original script into blocks. Blocks can be started with a special comment that HH understands that has the form __#[marker]\_begin__ (the default marker is __handsomeh__ ), and ended with __#[marker]\_end__. The defaults comments are then __#handsomeh_begin__ and __#handsomeh_end__. The begin comment can be followed on the same line by a JSON hash object (eventually empty) that control the behavior of that block.
+
+The following hash keys are valid commands to control the block behavior:
+
+| Command | Default | Meaning | 
+|---|---|---|
+| show_command_header | yes | Shows an header before the block execution |
+| show_command | yes | Shows the block commands |
+| show_output_header | yes | Shows an header the introduces the block execution output |
+| show_output  | yes | Show the block execution output |
+| pre_command_wait | yes | Wait for a keypress before the execution the block |
+| post_command_wait | no | Wait for a keypress after the execution the block|
+| pre_output_wait | yes | Wait for a keypress before showing the block execution output |
+| post_output_wait | no | Wait for a keypress after showing the block execution output |
+| subshell | yes | Execute the block in a subshell (only relevant when the output is not shown) |
 
 ## Installation
 
-### Dependencies
+Just copy the HH script in a directory within the PATH. The script has same dependencies:
 
-docopt
-
-imagemagick
-
-xdotool
-
-ffmpeg
+* __docopt__, a python library to handle command line arguments easily.
+* __xdotool__, to grab X windows.
+* __imagemagick__, to build gif files.
+* __ffmpeg__, to create videos.
