@@ -19,7 +19,7 @@ Options:
   -b <beamerdirectory>, --beamer <beamerdirectory>  Target beamer directory
 """
 from docopt import docopt
-from os import path,mkdir,chmod,system,chdir,remove
+from os import path,mkdir,chmod,system,chdir,remove,getcwd,listdir
 import sys
 import stat
 import re
@@ -38,6 +38,13 @@ def Info(message):
 
 def Debug(message):
     print ("\033[35m[Debug]\033[0m - " + message)
+
+def copyimages(source_folder, target_folder):
+    for file_name in listdir(source_folder):
+        source = source_folder + "/" + file_name
+        destination = target_folder + "/" + file_name
+        if path.isfile(source) and source.endswith(".jpg"):
+            shutil.copy(source, destination)
 
 def targetcommitblock(debug,blockinfo,block,seq):
     # Possible command:
@@ -195,18 +202,6 @@ def main():
     if debug:
         if framesdir: Debug("Frames directory: "+framesdir)
         else: Debug("No frames dir")
- 
-    # beamerdir = arguments["--beamer"]
-    # if beamerdir != None:
-    #     if path.exists(beamerdir):
-    #         Alert("Error: beamer dir '"+beamerdir+"' exists")
-    #         sys.exit(1)
-
-    # framesdir = arguments["--frames"]
-    # if framesdir != None:
-    #     if path.exists(framesdir):
-    #         Alert("Error: frames dir '"+framesdir+"' exists")
-    #         sys.exit(1)
 
     if debug: Debug("Opening files")
 
@@ -215,27 +210,6 @@ def main():
     except:
         Alert("Error opening source script '"+sourcescript+"'")
         sys.exit(1)        
-
-    # if beamerdir != None:
-    #     try:
-    #         mkdir(beamerdir)
-    #     except:
-    #         Alert("Error: creation of the directory '"+beamerdir+"' failed")
-    #         sys.exit(1)
-
-    #     try:
-    #         btarget = open(beamerdir+"/script.sh","w")
-    #     except:
-    #         Alert("Error opening target script '"+beamerdir+"/script.sh'")
-    #         sys.exit(1)        
-
-    # if framesdir != None:
-    #     try:
-    #         mkdir(framesdir)
-    #     except:
-    #         Alert("Error: creation of the directory '"+framesdir+"' failed")
-    #         sys.exit(1)
-
 
     ttarget = tempfile.NamedTemporaryFile(mode="w+t",delete=False)
     imagesdir = tempfile.TemporaryDirectory()
@@ -308,33 +282,15 @@ def main():
     ssource.close()
     ttarget.close()
 
-    # if beamerdir != None:
-    #     btarget.write("sleep 1\n")
-    #     #btarget.write("import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n")
-    #     btarget.write("import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n")
-    #     btarget.close()
-    #     chmod(beamerdir+"/script.sh", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
-    #     chdir(beamerdir)
-    #     system("./script.sh")
-    #     chdir("..")
-    #     btarget=open(beamerdir+"/frame.tex","w")
-    #     btarget.write("\\begin{frame}{Frame Title}\n")
-    #     btarget.write("\\begin{figure}[ht]\n")
-    #     btarget.write("\\begin{overlayarea}{9cm}{8cm}\n")
-    #     for i in range(seq):
-    #         btarget.write("\\only<"+str(i+1)+">{\\includegraphics[width=9cm]{frameimg"+"{:0>3d}".format(i)+".jpg}}\n")
-    #     btarget.write("\\end{overlayarea}\n")
-    #     btarget.write("\\end{figure}\n")
-    #     btarget.write("\\end{frame}\n")
-
-
     if imagesdir != None and not targetscript:
         vtarget.write("sleep 1\n")
         vtarget.write("import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n")
         vtarget.close()
         chmod(imagesdir.name+"/script.sh", stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        cwd=getcwd()
         chdir(imagesdir.name)
         system("./script.sh")
+        chdir(cwd)
 
     if targetscript:
         if path.exists(targetscript):
@@ -343,7 +299,50 @@ def main():
             sys.exit(1)
         shutil.copy2(ttarget.name,targetscript)
         chmod(targetscript, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
-        remove(ttarget.name)
+
+    if beamerdir:
+        if path.exists(beamerdir):
+            Alert("Error: beamer dir '"+beamerdir+"' exists")
+            sys.exit(1)        
+        try:
+            if debug: Debug("Creation of beamerdir "+beamerdir)
+            mkdir(beamerdir)
+        except:
+            Alert("Error: creation of the directory '"+beamerdir+"' failed")
+            sys.exit(1)
+
+        copyimages(imagesdir.name, beamerdir)
+
+        btarget=open(beamerdir+"/frame.tex","w")
+        btarget.write("\\begin{frame}{Frame Title}\n")
+        btarget.write("\\begin{figure}[ht]\n")
+        btarget.write("\\begin{overlayarea}{9cm}{8cm}\n")
+        for i in range(seq+1):
+            btarget.write("\\only<"+str(i+1)+">{\\includegraphics[width=9cm]{frameimg"+"{:0>3d}".format(i)+".jpg}}\n")
+        btarget.write("\\end{overlayarea}\n")
+        btarget.write("\\end{figure}\n")
+        btarget.write("\\end{frame}\n")
+
+    if framesdir:
+        if path.exists(framesdir):
+            Alert("Error: frames dir '"+framesdir+"' exists")
+            sys.exit(1)        
+        try:
+            if debug: Debug("Creation of framesdir "+framesdir)
+            mkdir(framesdir)
+        except:
+            Alert("Error: creation of the directory '"+framesdir+"' failed")
+            sys.exit(1)
+
+        copyimages(imagesdir.name, framesdir)
+    
+    if videofile:
+        system("ffmpeg -f image2 -r 1 -i " + imagesdir.name+ "/frameimg%03d.jpg -vcodec libx264 -crf 18  -pix_fmt yuv420p " + videofile)
+
+    if giffile:
+        system("convert -delay 100 -loop 0 " + imagesdir.name + "/frameimg*.jpg " + giffile)
+    
+    remove(ttarget.name)
 
 if __name__ == '__main__':
     main()
