@@ -1,3 +1,13 @@
 - Support for frame borders ?
 - Integration with synthetic voice speaking (mimic) ?
 - Some sort of title/info whatever superposition ?
+
+---------- mimic support
+- Singoli video dei singoli frame
+for i in `seq 0 4` ; do ffmpeg -t 1 -r 1 -i frameimg00$i.jpg -c:v libx264 -pix_fmt yuv420p slideshow$i.mp4 ;done
+- Attacca l'audio
+ffmpeg -i slideshow3.mp4 -i autio3.wav -c:v copy -c:a aac -strict experimental output3.mp4
+- Audio silenzioso
+ffmpeg -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -i slideshow4.mp4 -c:v copy -c:a aac -shortest output4.mp4
+- Concatena tutto.
+ ffmpeg -f concat -i file_list -c copy output.mp4
