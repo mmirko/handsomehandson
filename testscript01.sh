@@ -6,7 +6,7 @@ reset
 echo "Test01"
 #handsomeh_end
 
-#handsomeh_begin {"show_output_header": "yes"}
+#handsomeh_begin {"show_output_header": "yes", "pre_output_text": "/home/mirko/testo.txt"}
 echo "Test02"
 #handsomeh_end
 
