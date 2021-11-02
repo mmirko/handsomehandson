@@ -126,6 +126,14 @@ The following hash keys are valid commands to control the block behavior:
 | post_command_wait | no | Wait for a keypress after the execution the block|
 | pre_output_wait | yes | Wait for a keypress before showing the block execution output |
 | post_output_wait | no | Wait for a keypress after showing the block execution output |
+| pre_command_audio | None | Audio file to use as description before the execution of the block (video only) |
+| post_command_audio | None | Audio file to use as description after the execution of the block (video only) |
+| pre_output_audio | None | Audio file to use as description before showing the block execution output (video only) |
+| post_output_audio | None | Audio file to use as description after showing the block execution output (video only) |
+| pre_command_text | None | Text file to use as description before the execution of the block (video only) |
+| post_command_text | None | Text file to use as description after the execution of the block (video only) |
+| pre_output_text | None | Text file to use as description before showing the block execution output (video only) |
+| post_output_text | None | Text file to use as description after showing the block execution output (video only) |
 | subshell | yes | Execute the block in a subshell (only relevant when the output is not shown) |
 
 ## Installation
@@ -135,4 +143,5 @@ Just copy the HH script in a directory within the PATH. The script has same depe
 * __docopt__, a python library to handle command line arguments easily.
 * __xdotool__, to grab X windows.
 * __imagemagick__, to build gif files.
-* __ffmpeg__, to create videos.
+* __ffmpeg__, to manupulate audio and videos files.
+* __mimic__, for the speech synthesis.
