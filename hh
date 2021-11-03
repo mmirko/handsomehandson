@@ -91,7 +91,12 @@ def targetcommitblock(debug,blockinfo,block,seq):
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i "+blockinfo["pre_command_audio"]+" -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             else:
                 if "pre_command_text" in blockinfo:
-                    resultv+="mimic "+ blockinfo["pre_command_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                    if blockinfo["pre_command_text"].startswith("content:"):
+                        resultv+="echo \""+blockinfo["pre_command_text"][8:]+"\" > /tmp/tmpmimic\n"
+                        resultv+="mimic /tmp/tmpmimic $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                        resultv+="rm -f /tmp/tmpmimic > /dev/null 2>&1\n"
+                    else: 
+                        resultv+="mimic "+ blockinfo["pre_command_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 else:
                     resultv+="ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
@@ -130,7 +135,12 @@ def targetcommitblock(debug,blockinfo,block,seq):
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i "+blockinfo["post_command_audio"]+" -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             else:
                 if "post_command_text" in blockinfo:
-                    resultv+="mimic "+ blockinfo["post_command_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                    if blockinfo["post_command_text"].startswith("content:"):
+                        resultv+="echo \""+blockinfo["post_command_text"][8:]+"\" > /tmp/tmpmimic\n"
+                        resultv+="mimic /tmp/tmpmimic $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                        resultv+="rm -f /tmp/tmpmimic > /dev/null 2>&1\n"
+                    else: 
+                        resultv+="mimic "+ blockinfo["post_command_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 else:
                     resultv+="ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
@@ -153,7 +163,12 @@ def targetcommitblock(debug,blockinfo,block,seq):
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i "+blockinfo["pre_output_audio"]+" -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             else:
                 if "pre_output_text" in blockinfo:
-                    resultv+="mimic "+ blockinfo["pre_output_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                    if blockinfo["pre_output_text"].startswith("content:"):
+                        resultv+="echo \""+blockinfo["pre_output_text"][8:]+"\" > /tmp/tmpmimic\n"
+                        resultv+="mimic /tmp/tmpmimic $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                        resultv+="rm -f /tmp/tmpmimic > /dev/null 2>&1\n"
+                    else: 
+                        resultv+="mimic "+ blockinfo["pre_output_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 else:
                     resultv+="ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
@@ -205,7 +220,12 @@ def targetcommitblock(debug,blockinfo,block,seq):
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i "+blockinfo["post_output_audio"]+" -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             else:
                 if "post_output_text" in blockinfo:
-                    resultv+="mimic "+ blockinfo["post_output_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                    if blockinfo["post_output_text"].startswith("content:"):
+                        resultv+="echo \""+blockinfo["post_output_text"][8:]+"\" > /tmp/tmpmimic\n"
+                        resultv+="mimic /tmp/tmpmimic $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                        resultv+="rm -f /tmp/tmpmimic > /dev/null 2>&1\n"
+                    else:   
+                        resultv+="mimic "+ blockinfo["post_output_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 else:
                     resultv+="ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
