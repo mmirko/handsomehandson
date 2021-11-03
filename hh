@@ -359,7 +359,7 @@ def main():
 
         if videofile:
             vtarget.write("ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n")
-            vtarget.write("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n")
+            vtarget.write("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 3 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n")
             vtarget.write("ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n")
             vtarget.write("echo \"file 'output"+"{:0>3d}".format(seq)+".mp4'\" >> $HHCWD\"\"/file_list\n")
 
@@ -416,7 +416,12 @@ def main():
     
     if videofile:
         #system("ffmpeg -f image2 -r 1 -i " + imagesdir.name+ "/frameimg%03d.jpg -vcodec libx264 -crf 18  -pix_fmt yuv420p " + videofile)
-        system("ffmpeg -f concat -i " + imagesdir.name + "/file_list -c copy " + videofile+ " > /dev/null 2>&1")
+        filelist = ""
+        filter = ""
+        for i in range(seq):
+            filelist+=" -i "+imagesdir.name+"/output" + "{:0>3d}".format(i) + ".mp4"
+            filter+="["+str(i)+":v:0]["+str(i)+":a:0]"
+        system("ffmpeg "+filelist+"  -filter_complex \"" + filter + "concat=n="+str(seq)+":v=1:a=1[outv][outa]\"  -map \"[outv]\" -map \"[outa]\" " + videofile+ " > /dev/null 2>&1")
         #copyimages(imagesdir.name, "prova")
     if giffile:
         system("convert -delay 100 -loop 0 " + imagesdir.name + "/frameimg*.jpg " + giffile)
