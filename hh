@@ -418,10 +418,10 @@ def main():
         #system("ffmpeg -f image2 -r 1 -i " + imagesdir.name+ "/frameimg%03d.jpg -vcodec libx264 -crf 18  -pix_fmt yuv420p " + videofile)
         filelist = ""
         filter = ""
-        for i in range(seq):
+        for i in range(seq+1):
             filelist+=" -i "+imagesdir.name+"/output" + "{:0>3d}".format(i) + ".mp4"
             filter+="["+str(i)+":v:0]["+str(i)+":a:0]"
-        system("ffmpeg "+filelist+"  -filter_complex \"" + filter + "concat=n="+str(seq)+":v=1:a=1[outv][outa]\"  -map \"[outv]\" -map \"[outa]\" " + videofile+ " > /dev/null 2>&1")
+        system("ffmpeg "+filelist+"  -filter_complex \"" + filter + "concat=n="+str(seq+1)+":v=1:a=1[outv][outa]\"  -map \"[outv]\" -map \"[outa]\" " + videofile+ " > /dev/null 2>&1")
         #copyimages(imagesdir.name, "prova")
     if giffile:
         system("convert -delay 100 -loop 0 " + imagesdir.name + "/frameimg*.jpg " + giffile)
