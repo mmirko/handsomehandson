@@ -86,7 +86,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         #resultv+="import -window `xargs -0 -L1 -a /proc/self/environ | grep WINDOWID | cut -d= -f2` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         resultv+="import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         if "target" in blockinfo and blockinfo["target"]=="video":
-            resultv+="ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
+            resultv+="ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -vf \"pad=ceil(iw/2)*2:ceil(ih/2)*2\" -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             if "pre_command_audio" in blockinfo:
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i "+blockinfo["pre_command_audio"]+" -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             else:
@@ -95,8 +95,10 @@ def targetcommitblock(debug,blockinfo,block,seq):
                         resultv+="echo \""+blockinfo["pre_command_text"][8:]+"\" > /tmp/tmpmimic\n"
                         resultv+="mimic /tmp/tmpmimic $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                         resultv+="rm -f /tmp/tmpmimic > /dev/null 2>&1\n"
+                        #resultv+="echo \""+blockinfo["pre_command_text"][8:]+"\" > $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".pre\n"
                     else: 
                         resultv+="mimic "+ blockinfo["pre_command_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                        #resultv+="cat " + blockinfo["pre_command_text"]+ " > $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".pre\n"
                 else:
                     resultv+="ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
@@ -130,7 +132,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         resultv+="sleep 1\n"
         resultv+="import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         if "target" in blockinfo and blockinfo["target"]=="video":
-            resultv+="ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
+            resultv+="ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -vf \"pad=ceil(iw/2)*2:ceil(ih/2)*2\" -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             if "post_command_audio" in blockinfo:
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i "+blockinfo["post_command_audio"]+" -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             else:
@@ -139,8 +141,10 @@ def targetcommitblock(debug,blockinfo,block,seq):
                         resultv+="echo \""+blockinfo["post_command_text"][8:]+"\" > /tmp/tmpmimic\n"
                         resultv+="mimic /tmp/tmpmimic $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                         resultv+="rm -f /tmp/tmpmimic > /dev/null 2>&1\n"
+                        #resultv+="echo \""+blockinfo["post_command_text"][8:]+"\" > $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".post\n"
                     else: 
                         resultv+="mimic "+ blockinfo["post_command_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                        #resultv+="cat " + blockinfo["post_command_text"]+ " > $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".post\n"
                 else:
                     resultv+="ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
@@ -158,7 +162,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         resultv+="sleep 1\n"
         resultv+="import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         if "target" in blockinfo and blockinfo["target"]=="video":
-            resultv+="ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
+            resultv+="ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -vf \"pad=ceil(iw/2)*2:ceil(ih/2)*2\" -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             if "pre_output_audio" in blockinfo:
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i "+blockinfo["pre_output_audio"]+" -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             else:
@@ -167,8 +171,10 @@ def targetcommitblock(debug,blockinfo,block,seq):
                         resultv+="echo \""+blockinfo["pre_output_text"][8:]+"\" > /tmp/tmpmimic\n"
                         resultv+="mimic /tmp/tmpmimic $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                         resultv+="rm -f /tmp/tmpmimic > /dev/null 2>&1\n"
+                        #resultv+="echo \""+blockinfo["pre_output_text"][8:]+"\" > $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".pre\n"
                     else: 
                         resultv+="mimic "+ blockinfo["pre_output_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                        #resultv+="cat " + blockinfo["pre_output_text"]+ " > $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".pre\n"
                 else:
                     resultv+="ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
@@ -215,7 +221,7 @@ def targetcommitblock(debug,blockinfo,block,seq):
         resultv+="sleep 1\n"
         resultv+="import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n"
         if "target" in blockinfo and blockinfo["target"]=="video":
-            resultv+="ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
+            resultv+="ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -vf \"pad=ceil(iw/2)*2:ceil(ih/2)*2\" -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             if "post_output_audio" in blockinfo:
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i "+blockinfo["post_output_audio"]+" -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
             else:
@@ -224,8 +230,10 @@ def targetcommitblock(debug,blockinfo,block,seq):
                         resultv+="echo \""+blockinfo["post_output_text"][8:]+"\" > /tmp/tmpmimic\n"
                         resultv+="mimic /tmp/tmpmimic $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                         resultv+="rm -f /tmp/tmpmimic > /dev/null 2>&1\n"
+                        #resultv+="echo \""+blockinfo["post_output_text"][8:]+"\" > $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".post\n"
                     else:   
                         resultv+="mimic "+ blockinfo["post_output_text"] + " $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
+                        #resultv+="cat " + blockinfo["post_output_text"]+ " > $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".post\n"   
                 else:
                     resultv+="ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 1 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n"
                 resultv+="ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n"
@@ -358,7 +366,7 @@ def main():
         vtarget.write("import -window `xdotool getwindowfocus` $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg\n")
 
         if videofile:
-            vtarget.write("ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n")
+            vtarget.write("ffmpeg -t 1 -r 1 -i $HHCWD\"\"/frameimg"+"{:0>3d}".format(seq)+".jpg -vf \"pad=ceil(iw/2)*2:ceil(ih/2)*2\" -c:v libx264 -pix_fmt yuv420p $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n")
             vtarget.write("ffmpeg -f lavfi -i anullsrc=channel_layout=5.1:sample_rate=48000 -t 3 $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav > /dev/null 2>&1\n")
             vtarget.write("ffmpeg -i $HHCWD\"\"/slideshow"+"{:0>3d}".format(seq)+".mp4 -i $HHCWD\"\"/audio"+"{:0>3d}".format(seq)+".wav -c:v copy -c:a aac -strict experimental $HHCWD\"\"/output"+"{:0>3d}".format(seq)+".mp4 > /dev/null 2>&1\n")
             vtarget.write("echo \"file 'output"+"{:0>3d}".format(seq)+".mp4'\" >> $HHCWD\"\"/file_list\n")
