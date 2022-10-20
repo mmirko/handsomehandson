@@ -402,9 +402,9 @@ def main():
         btarget=open(beamerdir+"/frame.tex","w")
         btarget.write("\\begin{frame}{Frame Title}\n")
         btarget.write("\\begin{figure}[ht]\n")
-        btarget.write("\\begin{overlayarea}{9cm}{8cm}\n")
+        btarget.write("\\begin{overlayarea}{.9\\textwidth}{8cm}\n")
         for i in range(seq+1):
-            btarget.write("\\only<"+str(i+1)+">{\\includegraphics[width=9cm]{frameimg"+"{:0>3d}".format(i)+".jpg}}\n")
+            btarget.write("\\only<"+str(i+1)+">{\\includegraphics[width=\\textwidth]{frameimg"+"{:0>3d}".format(i)+".jpg}}\n")
         btarget.write("\\end{overlayarea}\n")
         btarget.write("\\end{figure}\n")
         btarget.write("\\end{frame}\n")
