@@ -4,7 +4,7 @@
    Copyright 2021 - Mirko Mariotti - https://www.mirkomariotti.it
 
 Usage:
-  hh -s <sourcescript> [--marker <textmarker>] [-d] (-t <targetscript> | -f <framesdirectory> | -v <videofile> | -g <giffile> | -b <beamerdirectory>)
+  hh -s <sourcescript> [--marker <textmarker>] [-d] (-t <targetscript> | -f <framesdirectory> | -v <videofile> | -g <giffile> | -b <beamerdirectory> [--beamerprefix <beamerprefix>])
   hh -h | --help
 
 Options:
@@ -17,6 +17,7 @@ Options:
   -g <giffile>, --gif <giffile>                     GIF image
   -f <framesdirectory>, --frames <framesdirectory>  Target frames directory
   -b <beamerdirectory>, --beamer <beamerdirectory>  Target beamer directory
+  --beamerprefix <beamerprefix>                     Use beamerdir prefix
 """
 from docopt import docopt
 from os import path,mkdir,chmod,system,chdir,remove,getcwd,listdir
@@ -276,6 +277,11 @@ def main():
         if beamerdir: Debug("Beamer directory: "+beamerdir)
         else: Debug("No beamer dir")
 
+    beamerprefix = arguments["--beamerprefix"]
+    if debug:
+        if beamerprefix: Debug("Beamer prefix directory: "+beamerprefix)
+        else: Debug("No beamer prefix dir")
+
     framesdir = arguments["--frames"]
     if debug:
         if framesdir: Debug("Frames directory: "+framesdir)
@@ -403,8 +409,12 @@ def main():
         btarget.write("\\begin{frame}{Frame Title}\n")
         btarget.write("\\begin{figure}[ht]\n")
         btarget.write("\\begin{overlayarea}{.9\\textwidth}{8cm}\n")
+        if beamerprefix:
+            beamerpf=beamerprefix+"/"
+        else:
+            beamerpf=""
         for i in range(seq+1):
-            btarget.write("\\only<"+str(i+1)+">{\\includegraphics[width=\\textwidth]{frameimg"+"{:0>3d}".format(i)+".jpg}}\n")
+            btarget.write("\\only<"+str(i+1)+">{\\includegraphics[width=\\textwidth]{"+beamerpf+"frameimg"+"{:0>3d}".format(i)+".jpg}}\n")
         btarget.write("\\end{overlayarea}\n")
         btarget.write("\\end{figure}\n")
         btarget.write("\\end{frame}\n")
